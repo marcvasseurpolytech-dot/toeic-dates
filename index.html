@@ -86,6 +86,52 @@
 
   header.top{margin-top:40px;}
 
+  /* ---------- Bandeau obligation réglementaire ---------- */
+  .notice-banner{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:2px solid var(--gold);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-top:24px;
+    background:rgba(201,162,75,0.06);
+    animation: noticePulse 1.7s ease-in-out infinite;
+  }
+  .notice-banner .icon{
+    font-family:'JetBrains Mono', monospace;
+    font-size:18px;
+    line-height:1;
+    flex-shrink:0;
+  }
+  .notice-banner .txt{
+    font-size:14px;
+    line-height:1.45;
+  }
+  .notice-banner .txt strong{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:4px;
+    color:var(--gold-soft);
+    font-weight:600;
+  }
+  @keyframes noticePulse{
+    0%, 100%{
+      border-color:var(--gold);
+      box-shadow:0 0 0 0 rgba(224,137,124,0);
+    }
+    50%{
+      border-color:var(--closed);
+      box-shadow:0 0 0 5px rgba(224,137,124,0.12);
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .notice-banner{animation:none; border-color:var(--closed);}
+  }
+
   /* ---------- Header ---------- */
   header.top{
     display:flex;
@@ -526,6 +572,14 @@
 </div>
 
 <div class="wrap">
+  <div class="notice-banner">
+    <span class="icon">⚠</span>
+    <div class="txt">
+      <strong>Règlement des études</strong>
+      Vous avez l'obligation de passer un TOEIC officiel au cours de votre 4ème année comme l'indique le règlement des études.
+    </div>
+  </div>
+
   <header class="top">
     <div>
       <div class="eyebrow">Polytech Lille — Centre d'examen TOEIC</div>
