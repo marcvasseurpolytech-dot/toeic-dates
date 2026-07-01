@@ -549,12 +549,43 @@
 
   /* ---------- Print ---------- */
   @media print{
-    body{background:#fff;}
-    .actions, footer{display:none;}
+    body{background:#fff !important; color:#000;}
     .wrap{max-width:100%; padding:0;}
-    .ticket{box-shadow:none; border:2px solid var(--navy);}
-    header.top{border-bottom:3px solid var(--navy);}
+    .actions, footer, .credit{display:none;}
+
+    .brand-strip{background:#fff !important; margin:0; padding:6px 0; border-bottom:1px solid #000;}
+    .ets-mark .ets, .ets-mark .toeic span, .ets-mark .toeic .accent, .brand-strip-right{color:#000 !important;}
+    .ets-mark .bar{background:#000;}
+
+    .notice-banner{
+      background:#fff !important;
+      border:2px solid #000 !important;
+      animation:none !important;
+      box-shadow:none !important;
+    }
+    .notice-banner .txt, .notice-banner .txt strong, .notice-banner .icon{color:#000 !important;}
+
+    header.top{border-bottom:2px solid #000;}
+    .eyebrow, .brand, .brand em, .today{color:#000 !important;}
+
+    .ticket{background:#fff !important; color:#000 !important; border:2px solid #000; box-shadow:none;}
+    .ticket-main::after{display:none;}
+    .ticket-eyebrow, .ticket-sub, .ticket-row .lbl, .stub-label{color:#444 !important;}
+    .ticket-date, .ticket-row .val, .ticket-public, .status{color:#000 !important;}
+    .ticket-public{border-color:#000;}
+    .ticket-stub{background:#fff !important;}
+    .dot{background:#000 !important;}
     .ticket-date{font-size:52px;}
+
+    .qr-box{background:#fff; border:1px solid #000;}
+
+    .section-title{color:#000 !important; border-bottom:1px solid #000;}
+    .list-row{border-color:#ccc;}
+    .list-row .node{background:#000 !important;}
+    .list-row .d, .list-row .st, .list-row .pub, .list-row .win{color:#000 !important;}
+    .list-row.past{opacity:0.55;}
+    .today-divider::before, .today-divider::after{background:repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 9px) !important;}
+    .today-divider span{color:#000 !important;}
   }
 </style>
 </head>
