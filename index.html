@@ -564,7 +564,7 @@
     }
     body{background:#fff !important;}
     .wrap{max-width:100%; padding:0;}
-    .actions, footer, .credit{display:none;}
+    .actions, footer, .credit, .overlay{display:none !important;}
 
     .brand-strip{background:#fff !important; margin:0; padding:6px 0; border-bottom:2px solid var(--navy);}
     .ets-mark .ets, .brand-strip-right{color:var(--ink-soft) !important;}
@@ -652,10 +652,6 @@
 
   <div id="heroTicket"></div>
 
-  <div class="actions">
-    <button class="btn" onclick="window.print()">Imprimer pour la porte</button>
-  </div>
-
   <div class="section-title">Calendrier des sessions</div>
   <div class="list" id="listBox"></div>
 
@@ -686,6 +682,7 @@
     <button class="close-panel" id="closePanel">&times;</button>
     <h2>Calendrier TOEIC — édition</h2>
     <div class="sub">Cette partie n'est pas visible par les étudiants.</div>
+    <button class="btn" id="printBtn" style="margin-bottom:18px;">Imprimer pour la porte</button>
 
     <div class="form-grid">
       <div class="field">
@@ -993,6 +990,10 @@ document.getElementById('closePanelCode').addEventListener('click', hideOverlay)
 document.getElementById('closePanel').addEventListener('click', hideOverlay);
 document.getElementById('overlay').addEventListener('click', (e)=>{
   if(e.target.id === 'overlay') hideOverlay();
+});
+document.getElementById('printBtn').addEventListener('click', ()=>{
+  hideOverlay();
+  setTimeout(()=> window.print(), 150);
 });
 
 loadSessions();
