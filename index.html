@@ -549,43 +549,72 @@
 
   /* ---------- Print ---------- */
   @media print{
-    body{background:#fff !important; color:#000;}
+    :root{
+      --navy:#14213D;
+      --navy-deep:#0A1424;
+      --gold:#AD7F2E;
+      --gold-soft:#8A6522;
+      --ink:#241B10;
+      --ink-soft:#5B5140;
+      --line: rgba(20,33,61,0.2);
+      --line-gold: rgba(173,127,46,0.5);
+      --paper:#FCFAF3;
+      --ok:#3F6B4A;
+      --closed:#9B4A3F;
+    }
+    body{background:#fff !important;}
     .wrap{max-width:100%; padding:0;}
     .actions, footer, .credit{display:none;}
 
-    .brand-strip{background:#fff !important; margin:0; padding:6px 0; border-bottom:1px solid #000;}
-    .ets-mark .ets, .ets-mark .toeic span, .ets-mark .toeic .accent, .brand-strip-right{color:#000 !important;}
-    .ets-mark .bar{background:#000;}
+    .brand-strip{background:#fff !important; margin:0; padding:6px 0; border-bottom:2px solid var(--navy);}
+    .ets-mark .ets, .brand-strip-right{color:var(--ink-soft) !important;}
+    .ets-mark .toeic span{color:var(--navy) !important;}
+    .ets-mark .toeic .accent{color:#9B3E2F !important;}
+    .ets-mark .bar{background:var(--ink-soft);}
 
     .notice-banner{
-      background:#fff !important;
-      border:2px solid #000 !important;
+      background:rgba(173,127,46,0.07) !important;
+      border:2px solid var(--gold) !important;
       animation:none !important;
       box-shadow:none !important;
     }
-    .notice-banner .txt, .notice-banner .txt strong, .notice-banner .icon{color:#000 !important;}
+    .notice-banner .txt{color:var(--ink) !important;}
+    .notice-banner .txt strong{color:var(--gold-soft) !important;}
 
-    header.top{border-bottom:2px solid #000;}
-    .eyebrow, .brand, .brand em, .today{color:#000 !important;}
+    header.top{border-bottom:2px solid var(--navy);}
+    .eyebrow{color:var(--ink-soft) !important;}
+    .brand{color:var(--ink) !important;}
+    .brand em{color:var(--gold) !important;}
+    .today{color:var(--ink-soft) !important;}
 
-    .ticket{background:#fff !important; color:#000 !important; border:2px solid #000; box-shadow:none;}
-    .ticket-main::after{display:none;}
-    .ticket-eyebrow, .ticket-sub, .ticket-row .lbl, .stub-label{color:#444 !important;}
-    .ticket-date, .ticket-row .val, .ticket-public, .status{color:#000 !important;}
-    .ticket-public{border-color:#000;}
-    .ticket-stub{background:#fff !important;}
-    .dot{background:#000 !important;}
-    .ticket-date{font-size:52px;}
+    .ticket{background:#fff !important; color:var(--ink) !important; border:2px solid var(--navy); box-shadow:none;}
+    .ticket-main::after{background-image:linear-gradient(var(--line-gold) 60%, transparent 0%); opacity:1;}
+    .ticket-eyebrow{color:var(--gold-soft) !important;}
+    .ticket-public{border-color:var(--gold) !important; color:var(--gold-soft) !important;}
+    .ticket-date{color:var(--navy) !important; font-size:52px;}
+    .ticket-sub{color:var(--ink-soft) !important;}
+    .ticket-row .lbl{color:var(--ink-soft) !important;}
+    .ticket-row .val{color:var(--navy) !important;}
+    .status{color:var(--ink) !important;}
+    .dot.open{background:var(--ok) !important;}
+    .dot.closed{background:var(--closed) !important;}
+    .ticket-stub{background:rgba(20,33,61,0.05) !important;}
+    .stub-label{color:var(--ink-soft) !important;}
 
-    .qr-box{background:#fff; border:1px solid #000;}
+    .qr-box{background:#fff; border:1px solid var(--navy);}
 
-    .section-title{color:#000 !important; border-bottom:1px solid #000;}
-    .list-row{border-color:#ccc;}
-    .list-row .node{background:#000 !important;}
-    .list-row .d, .list-row .st, .list-row .pub, .list-row .win{color:#000 !important;}
+    .section-title{color:var(--navy) !important; border-bottom:1px solid var(--line);}
+    .list-row{border-color:var(--line);}
+    .list-row .node{background:var(--gold) !important;}
+    .list-row .d{color:var(--navy) !important;}
+    .list-row .pub, .list-row .win{color:var(--ink-soft) !important;}
+    .list-row .st.ok{color:var(--ok) !important;}
+    .list-row .st.closed{color:var(--closed) !important;}
+    .list-row .st.next{color:var(--gold-soft) !important;}
     .list-row.past{opacity:0.55;}
-    .today-divider::before, .today-divider::after{background:repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 9px) !important;}
-    .today-divider span{color:#000 !important;}
+    .list-row.past .d{color:var(--ink-soft) !important;}
+    .today-divider::before, .today-divider::after{background:repeating-linear-gradient(90deg,var(--gold) 0 5px, transparent 5px 9px) !important; opacity:0.8;}
+    .today-divider span{color:var(--gold-soft) !important;}
   }
 </style>
 </head>
