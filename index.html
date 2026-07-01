@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC — Session officielle | Polytech Lille</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --navy:#14213D;
+    --navy-deep:#0A1424;
+    --gold:#C9A24B;
+    --gold-soft:#E7CD87;
+    --cream:#F6F1E3;
+    --paper:#FCFAF3;
+    --ink:#241B10;
+    --ink-soft:#5B5140;
+    --line: rgba(20,33,61,0.16);
+    --line-gold: rgba(201,162,75,0.45);
+    --ok:#3F6B4A;
+    --closed:#9B4A3F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(201,162,75,0.10), transparent 60%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 24px 96px;}
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:2px solid var(--navy);
+    padding-bottom:18px;
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--navy);
+    opacity:0.75;
+  }
+  .brand{
+    font-family:'Playfair Display', serif;
+    font-weight:900;
+    font-size:26px;
+    color:var(--navy);
+    letter-spacing:0.01em;
+    margin-top:4px;
+  }
+  .brand em{color:var(--gold); font-style:normal;}
+  .top-right{text-align:right;}
+  .today{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Hero ticket ---------- */
+  .ticket{
+    position:relative;
+    background:var(--navy);
+    color:var(--paper);
+    border-radius:14px;
+    display:flex;
+    box-shadow: 0 18px 40px -20px rgba(10,20,36,0.55);
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .ticket-main{
+    flex:1;
+    padding:34px 30px;
+    position:relative;
+  }
+  .ticket-main::after{
+    content:"";
+    position:absolute; top:0; right:0; bottom:0;
+    width:1px;
+    background-image: linear-gradient(var(--paper) 60%, transparent 0%);
+    background-size: 2px 14px;
+    opacity:0.25;
+  }
+  .ticket-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+  }
+  .ticket-public{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border:1px solid var(--gold);
+    border-radius:999px;
+    color:var(--gold-soft);
+  }
+  .ticket-date{
+    font-family:'Playfair Display', serif;
+    font-weight:900;
+    font-size:44px;
+    line-height:1.05;
+    margin:14px 0 4px;
+    text-transform:capitalize;
+  }
+  .ticket-sub{
+    font-family:'Source Serif 4', serif;
+    font-size:14.5px;
+    color:rgba(252,250,243,0.78);
+    margin-bottom:20px;
+  }
+  .ticket-rows{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 24px;
+    margin-top:6px;
+  }
+  .ticket-row .lbl{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(252,250,243,0.55);
+    margin-bottom:3px;
+  }
+  .ticket-row .val{
+    font-size:15px;
+    font-weight:500;
+  }
+  .ticket-row .status{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .dot.open{background:#7FD79A;}
+  .dot.closed{background:#E28C7F;}
+
+  .ticket-stub{
+    width:190px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:26px 18px;
+    background:rgba(0,0,0,0.14);
+  }
+  .qr-box{
+    background:var(--paper);
+    padding:8px;
+    border-radius:8px;
+  }
+  .qr-box img, .qr-box canvas{display:block; width:120px; height:120px;}
+  .stub-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-align:center;
+    color:rgba(252,250,243,0.65);
+  }
+
+  .empty-ticket{
+    padding:50px 30px;
+    text-align:center;
+  }
+  .empty-ticket .ticket-date{font-size:22px; font-weight:600; font-style:italic; color:rgba(252,250,243,0.75);}
+
+  /* ---------- Actions row ---------- */
+  .actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-bottom:44px;
+  }
+  .btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:9px 16px;
+    border-radius:7px;
+    border:1px solid var(--navy);
+    background:transparent;
+    color:var(--navy);
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover{background:var(--navy); color:var(--paper);}
+
+  /* ---------- Upcoming list ---------- */
+  .section-title{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:19px;
+    color:var(--navy);
+    margin:0 0 16px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .list{border-top:1px solid var(--line);}
+  .list-row{
+    display:grid;
+    grid-template-columns:120px 1fr 170px 100px;
+    align-items:center;
+    gap:14px;
+    padding:14px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+  }
+  .list-row .d{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:600;
+    color:var(--navy);
+  }
+  .list-row .pub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .list-row .win{color:var(--ink-soft); font-size:13.5px;}
+  .list-row .st{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    text-align:right;
+  }
+  .st.ok{color:var(--ok);}
+  .st.closed{color:var(--closed);}
+  .empty-note{
+    padding:26px 4px;
+    color:var(--ink-soft);
+    font-style:italic;
+    font-size:14.5px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    margin-top:56px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .admin-btn{
+    font-size:10.5px;
+    padding:6px 12px;
+    border-color:var(--line);
+    color:var(--ink-soft);
+    opacity:0.6;
+  }
+  .admin-btn:hover{background:var(--navy); color:var(--paper); opacity:1;}
+
+  /* ---------- Code prompt ---------- */
+  .code-box{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:center;
+    padding:6px 0 2px;
+  }
+  .code-box input{
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    letter-spacing:0.08em;
+    text-align:center;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    width:220px;
+  }
+  .code-error{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--closed);
+    min-height:16px;
+  }
+
+  /* ---------- Admin overlay ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(10,20,36,0.55);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:50;
+  }
+  .overlay.show{display:flex;}
+  .panel{
+    background:var(--paper);
+    width:100%; max-width:640px;
+    max-height:86vh;
+    overflow-y:auto;
+    border-radius:14px;
+    padding:28px 28px 24px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+  .panel h2{
+    font-family:'Playfair Display', serif;
+    font-size:21px;
+    color:var(--navy);
+    margin:0 0 4px;
+  }
+  .panel .sub{font-size:13px; color:var(--ink-soft); margin-bottom:20px;}
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .field{display:flex; flex-direction:column; gap:5px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+  }
+  .field input[type=date], .field select{
+    font-family:'Source Serif 4', serif;
+    font-size:14px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field.checkrow{flex-direction:row; align-items:center; gap:8px; margin-top:4px;}
+  .panel .btn.primary{background:var(--navy); color:var(--paper); width:100%; margin-top:6px; padding:11px;}
+  .panel .btn.primary:hover{background:var(--navy-deep);}
+  .admin-list{margin-top:24px; border-top:1px solid var(--line);}
+  .admin-row{
+    display:grid;
+    grid-template-columns:1fr 1fr auto auto auto;
+    gap:10px;
+    align-items:center;
+    padding:10px 2px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .admin-row .mini{font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--ink-soft);}
+  .icon-btn{
+    background:none; border:none; cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    padding:4px 8px;
+    border-radius:5px;
+  }
+  .icon-btn:hover{background:var(--line); color:var(--ink);}
+  .icon-btn.danger:hover{background:rgba(155,74,63,0.14); color:var(--closed);}
+  .close-panel{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink-soft);
+  }
+  .panel-wrap{position:relative;}
+  .save-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px; min-height:16px;}
+
+  @media (max-width:640px){
+    .ticket{flex-direction:column;}
+    .ticket-stub{width:100%; flex-direction:row; justify-content:center;}
+    .ticket-rows{grid-template-columns:1fr 1fr;}
+    .list-row{grid-template-columns:1fr; gap:4px;}
+    .list-row .st{text-align:left;}
+    .form-grid{grid-template-columns:1fr;}
+    .admin-row{grid-template-columns:1fr; text-align:left;}
+  }
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff;}
+    .actions, footer{display:none;}
+    .wrap{max-width:100%; padding:0;}
+    .ticket{box-shadow:none; border:2px solid var(--navy);}
+    header.top{border-bottom:3px solid var(--navy);}
+    .ticket-date{font-size:52px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Polytech Lille — Centre d'examen TOEIC</div>
+      <div class="brand">Session <em>TOEIC</em> officielle</div>
+    </div>
+    <div class="top-right">
+      <div class="today" id="todayLabel"></div>
+    </div>
+  </header>
+
+  <div id="heroTicket"></div>
+
+  <div class="actions">
+    <button class="btn" onclick="window.print()">Imprimer pour la porte</button>
+  </div>
+
+  <div class="section-title">Prochaines sessions</div>
+  <div class="list" id="listBox"></div>
+
+  <footer>
+    <span>Contact · marc.vasseur@polytech-lille.fr</span>
+    <button class="btn admin-btn" id="adminBtn">Admin</button>
+  </footer>
+</div>
+
+<!-- ---------- Admin overlay ---------- -->
+<div class="overlay" id="overlay">
+  <div class="panel panel-wrap" id="codePanel">
+    <button class="close-panel" id="closePanelCode">&times;</button>
+    <h2>Accès administrateur</h2>
+    <div class="sub">Code requis pour modifier le calendrier.</div>
+    <div class="code-box">
+      <input type="password" id="codeInput" placeholder="Code" autocomplete="off">
+      <button class="btn primary" id="codeSubmit" style="width:220px;">Valider</button>
+      <div class="code-error" id="codeError"></div>
+    </div>
+  </div>
+
+  <div class="panel panel-wrap" id="editPanel" style="display:none;">
+    <button class="close-panel" id="closePanel">&times;</button>
+    <h2>Calendrier TOEIC — édition</h2>
+    <div class="sub">Cette partie n'est pas visible par les étudiants.</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Date de l'examen</label>
+        <input type="date" id="f-exam">
+      </div>
+      <div class="field">
+        <label>Public concerné</label>
+        <select id="f-public">
+          <option value="tous">Tous les étudiants</option>
+          <option value="apprentis">Apprentis uniquement</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ouverture des inscriptions</label>
+        <input type="date" id="f-open">
+      </div>
+      <div class="field">
+        <label>Fermeture des inscriptions</label>
+        <input type="date" id="f-close">
+      </div>
+      <div class="field full checkrow">
+        <input type="checkbox" id="f-visible" checked>
+        <label style="margin:0;">Visible sur la page étudiants</label>
+      </div>
+    </div>
+    <button class="btn primary" id="addBtn">Ajouter au calendrier</button>
+    <div class="save-note" id="saveNote"></div>
+
+    <div class="admin-list" id="adminList"></div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'toeic-sessions';
+let sessions = [];
+
+const monthsFR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const daysFR = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+
+function parseDate(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y, m-1, d); }
+function fmtLong(dateObj){
+  if(!dateObj) return '';
+  return daysFR[dateObj.getDay()] + ' ' + dateObj.getDate() + ' ' + monthsFR[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+}
+function fmtShort(dateObj){
+  if(!dateObj) return '—';
+  const dd=String(dateObj.getDate()).padStart(2,'0');
+  const mm=String(dateObj.getMonth()+1).padStart(2,'0');
+  return dd+'/'+mm+'/'+dateObj.getFullYear();
+}
+function todayMidnight(){ const t=new Date(); t.setHours(0,0,0,0); return t; }
+
+document.getElementById('todayLabel').textContent = 'Aujourd\'hui — ' + fmtLong(todayMidnight());
+
+async function loadSessions(){
+  try{
+    const res = await window.storage.get(STORE_KEY, true);
+    sessions = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){
+    sessions = [];
+  }
+  render();
+}
+
+async function saveSessions(){
+  try{
+    await window.storage.set(STORE_KEY, JSON.stringify(sessions), true);
+  }catch(e){
+    document.getElementById('saveNote').textContent = "Erreur d'enregistrement, réessaie.";
+  }
+}
+
+function upcomingVisible(){
+  const t = todayMidnight();
+  return sessions
+    .filter(s => s.visible !== false)
+    .map(s => ({...s, examObj: parseDate(s.exam)}))
+    .filter(s => s.examObj && s.examObj >= t)
+    .sort((a,b)=> a.examObj - b.examObj);
+}
+
+function renderHero(){
+  const box = document.getElementById('heroTicket');
+  const upcoming = upcomingVisible();
+  const pageUrl = window.location.href;
+
+  if(upcoming.length === 0){
+    box.innerHTML = `
+      <div class="ticket">
+        <div class="ticket-main empty-ticket">
+          <div class="ticket-eyebrow">Aucune session programmée</div>
+          <div class="ticket-date">Le calendrier sera mis à jour prochainement</div>
+          <div class="ticket-sub">Reviens consulter cette page ou contacte M. Vasseur.</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const s = upcoming[0];
+  const openObj = parseDate(s.open);
+  const closeObj = parseDate(s.close);
+  const t = todayMidnight();
+  const isOpen = openObj && closeObj && t >= openObj && t <= closeObj;
+  const isBefore = openObj && t < openObj;
+  const isClosed = closeObj && t > closeObj;
+
+  let statusLabel, statusDot;
+  if(isOpen){ statusLabel='Inscriptions ouvertes'; statusDot='open'; }
+  else if(isBefore){ statusLabel='Inscriptions à venir'; statusDot='closed'; }
+  else if(isClosed){ statusLabel='Inscriptions closes'; statusDot='closed'; }
+  else { statusLabel='—'; statusDot='closed'; }
+
+  const publicLabel = s.public === 'apprentis' ? 'Apprentis uniquement' : 'Tous les étudiants';
+
+  box.innerHTML = `
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="ticket-eyebrow">Prochaine session</div>
+        <span class="ticket-public">${publicLabel}</span>
+        <div class="ticket-date">${fmtLong(s.examObj)}</div>
+        <div class="ticket-sub">Examen officiel TOEIC — Polytech Lille</div>
+        <div class="ticket-rows">
+          <div class="ticket-row">
+            <div class="lbl">Ouverture inscriptions</div>
+            <div class="val">${fmtShort(openObj)}</div>
+          </div>
+          <div class="ticket-row">
+            <div class="lbl">Fermeture inscriptions</div>
+            <div class="val">${fmtShort(closeObj)}</div>
+          </div>
+          <div class="ticket-row" style="grid-column:1/-1;">
+            <div class="lbl">Statut</div>
+            <div class="status"><span class="dot ${statusDot}"></span>${statusLabel}</div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket-stub">
+        <div class="qr-box" id="qrBox"></div>
+        <div class="stub-label">Scanner pour<br>consulter sur mobile</div>
+      </div>
+    </div>`;
+
+  const qrBox = document.getElementById('qrBox');
+  if(qrBox && window.QRCode){
+    qrBox.innerHTML = '';
+    new QRCode(qrBox, { text: pageUrl, width:120, height:120, colorDark:'#14213D', colorLight:'#FCFAF3' });
+  }
+}
+
+function renderList(){
+  const listBox = document.getElementById('listBox');
+  const upcoming = upcomingVisible();
+  const rest = upcoming.slice(1);
+
+  if(rest.length === 0){
+    listBox.innerHTML = `<div class="empty-note">${upcoming.length <= 1 ? "Pas d'autre session programmée pour l'instant." : ''}</div>`;
+    return;
+  }
+
+  listBox.innerHTML = rest.map(s=>{
+    const openObj = parseDate(s.open), closeObj = parseDate(s.close);
+    const t = todayMidnight();
+    const isOpen = openObj && closeObj && t >= openObj && t <= closeObj;
+    const publicLabel = s.public === 'apprentis' ? 'Apprentis' : 'Tous';
+    return `<div class="list-row">
+      <div class="d">${fmtShort(s.examObj)}</div>
+      <div class="pub">${publicLabel}</div>
+      <div class="win">Inscriptions du ${fmtShort(openObj)} au ${fmtShort(closeObj)}</div>
+      <div class="st ${isOpen ? 'ok':'closed'}">${isOpen ? 'Ouvertes' : 'À venir / closes'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminList(){
+  const box = document.getElementById('adminList');
+  if(sessions.length === 0){
+    box.innerHTML = '<div class="empty-note">Aucune session enregistrée.</div>';
+    return;
+  }
+  const sorted = [...sessions].sort((a,b)=> parseDate(a.exam) - parseDate(b.exam));
+  box.innerHTML = sorted.map(s=>{
+    const publicLabel = s.public === 'apprentis' ? 'Apprentis' : 'Tous';
+    return `<div class="admin-row" data-id="${s.id}">
+      <div><strong>${fmtShort(parseDate(s.exam))}</strong></div>
+      <div class="mini">Insc. ${fmtShort(parseDate(s.open))} → ${fmtShort(parseDate(s.close))} · ${publicLabel}</div>
+      <div class="mini">${s.visible === false ? 'Masquée' : 'Visible'}</div>
+      <button class="icon-btn" data-action="toggle" data-id="${s.id}">${s.visible === false ? 'Afficher' : 'Masquer'}</button>
+      <button class="icon-btn danger" data-action="delete" data-id="${s.id}">Supprimer</button>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('[data-action="toggle"]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      const sess = sessions.find(x=>x.id===id);
+      if(sess){ sess.visible = sess.visible === false ? true : false; await saveSessions(); render(); }
+    });
+  });
+  box.querySelectorAll('[data-action="delete"]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.id;
+      sessions = sessions.filter(x=>x.id!==id);
+      await saveSessions(); render();
+    });
+  });
+}
+
+function render(){
+  renderHero();
+  renderList();
+  renderAdminList();
+}
+
+document.getElementById('addBtn').addEventListener('click', async ()=>{
+  const exam = document.getElementById('f-exam').value;
+  const open = document.getElementById('f-open').value;
+  const close = document.getElementById('f-close').value;
+  const pub = document.getElementById('f-public').value;
+  const visible = document.getElementById('f-visible').checked;
+  const note = document.getElementById('saveNote');
+
+  if(!exam || !open || !close){
+    note.textContent = 'Renseigne au minimum la date d\'examen et la fenêtre d\'inscription.';
+    return;
+  }
+  sessions.push({
+    id: 's_' + Date.now(),
+    exam, open, close, public: pub, visible
+  });
+  await saveSessions();
+  note.textContent = 'Session ajoutée.';
+  document.getElementById('f-exam').value='';
+  document.getElementById('f-open').value='';
+  document.getElementById('f-close').value='';
+  document.getElementById('f-visible').checked = true;
+  render();
+  setTimeout(()=>{ note.textContent=''; }, 2500);
+});
+
+/* ---------- Admin access protected by code (hash only, never the code itself) ---------- */
+const ADMIN_HASH = '94718851696c4e600062f4772aecd129f7356ee2222419aaa6a5c92f2124ea8f';
+
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function showOverlay(){
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('codePanel').style.display = 'block';
+  document.getElementById('editPanel').style.display = 'none';
+  document.getElementById('codeInput').value = '';
+  document.getElementById('codeError').textContent = '';
+  setTimeout(()=> document.getElementById('codeInput').focus(), 50);
+}
+function hideOverlay(){
+  document.getElementById('overlay').classList.remove('show');
+}
+async function tryUnlock(){
+  const val = document.getElementById('codeInput').value;
+  const hash = await sha256Hex(val);
+  if(hash === ADMIN_HASH){
+    document.getElementById('codePanel').style.display = 'none';
+    document.getElementById('editPanel').style.display = 'block';
+    document.getElementById('codeError').textContent = '';
+  }else{
+    document.getElementById('codeError').textContent = 'Code incorrect.';
+  }
+}
+
+document.getElementById('adminBtn').addEventListener('click', showOverlay);
+document.getElementById('codeSubmit').addEventListener('click', tryUnlock);
+document.getElementById('codeInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') tryUnlock(); });
+document.getElementById('closePanelCode').addEventListener('click', hideOverlay);
+document.getElementById('closePanel').addEventListener('click', hideOverlay);
+document.getElementById('overlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'overlay') hideOverlay();
+});
+
+loadSessions();
+</script>
+
+</body>
+</html>
