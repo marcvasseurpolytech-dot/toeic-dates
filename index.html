@@ -33,7 +33,57 @@
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:900px;margin:0 auto;padding:48px 24px 96px;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px 96px;}
+
+  /* ---------- ETS / TOEIC brand strip ---------- */
+  .brand-strip{
+    background:var(--navy-deep);
+    color:var(--paper);
+    padding:9px 24px;
+    margin:0 calc(-1 * max(0px, (100vw - 900px)/2 - 24px));
+  }
+  .brand-strip-inner{
+    max-width:900px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .ets-mark{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+  }
+  .ets-mark .ets{
+    color:rgba(252,250,243,0.55);
+    font-weight:500;
+  }
+  .ets-mark .bar{width:1px; height:11px; background:rgba(252,250,243,0.3);}
+  .ets-mark .toeic{
+    font-family:'Playfair Display', serif;
+    font-weight:900;
+    font-style:normal;
+    letter-spacing:0.03em;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:1px;
+  }
+  .ets-mark .toeic span{color:var(--paper);}
+  .ets-mark .toeic .accent{color:#C64B3C;}
+  .brand-strip-right{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:rgba(252,250,243,0.5);
+  }
+
+  header.top{margin-top:40px;}
 
   /* ---------- Header ---------- */
   header.top{
@@ -209,7 +259,7 @@
   }
   .btn:hover{background:var(--navy); color:var(--paper);}
 
-  /* ---------- Upcoming list ---------- */
+  /* ---------- Timeline (calendrier complet) ---------- */
   .section-title{
     font-family:'Playfair Display', serif;
     font-weight:700;
@@ -220,15 +270,20 @@
     padding-bottom:8px;
     border-bottom:1px solid var(--line);
   }
-  .list{border-top:1px solid var(--line);}
+  .list{border-top:1px solid var(--line); position:relative;}
   .list-row{
     display:grid;
-    grid-template-columns:120px 1fr 170px 100px;
+    grid-template-columns:26px 100px 1fr 170px 110px;
     align-items:center;
-    gap:14px;
-    padding:14px 4px;
+    gap:12px;
+    padding:13px 4px;
     border-bottom:1px solid var(--line);
     font-size:14.5px;
+  }
+  .list-row .node{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--gold);
+    justify-self:center;
   }
   .list-row .d{
     font-family:'JetBrains Mono', monospace;
@@ -251,6 +306,37 @@
   }
   .st.ok{color:var(--ok);}
   .st.closed{color:var(--closed);}
+  .st.next{color:var(--gold); font-weight:600;}
+
+  /* Sessions passées : estompées, révolues */
+  .list-row.past{opacity:0.45;}
+  .list-row.past .node{background:var(--ink-soft);}
+  .list-row.past .d{color:var(--ink-soft); text-decoration:line-through; text-decoration-color:rgba(91,81,64,0.5);}
+  .list-row.past .st{color:var(--ink-soft);}
+
+  .today-divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 4px;
+    margin:2px 0;
+  }
+  .today-divider::before, .today-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:repeating-linear-gradient(90deg, var(--navy) 0 5px, transparent 5px 9px);
+    opacity:0.5;
+  }
+  .today-divider span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--navy);
+    white-space:nowrap;
+  }
+
   .empty-note{
     padding:26px 4px;
     color:var(--ink-soft);
@@ -269,6 +355,17 @@
     font-family:'JetBrains Mono', monospace;
     font-size:11.5px;
     color:var(--ink-soft);
+  }
+  .footer-contact a{color:var(--ink-soft);}
+  .footer-contact .office{margin-top:3px; opacity:0.75;}
+  .credit{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    opacity:0.4;
+    margin-top:14px;
   }
   .admin-btn{
     font-size:10.5px;
@@ -391,7 +488,9 @@
     .ticket{flex-direction:column;}
     .ticket-stub{width:100%; flex-direction:row; justify-content:center;}
     .ticket-rows{grid-template-columns:1fr 1fr;}
-    .list-row{grid-template-columns:1fr; gap:4px;}
+    .list-row{grid-template-columns:16px 1fr; gap:4px 10px;}
+    .list-row .node{align-self:start; margin-top:6px;}
+    .list-row .win, .list-row .pub, .list-row .st{grid-column:2;}
     .list-row .st{text-align:left;}
     .form-grid{grid-template-columns:1fr;}
     .admin-row{grid-template-columns:1fr; text-align:left;}
@@ -410,6 +509,17 @@
 </head>
 <body>
 
+<div class="brand-strip">
+  <div class="brand-strip-inner">
+    <div class="ets-mark">
+      <span class="ets">ETS</span>
+      <span class="bar"></span>
+      <span class="toeic"><span>TO</span><span class="accent">EIC</span><span>®</span></span>
+    </div>
+    <div class="brand-strip-right">Centre d'examen agréé</div>
+  </div>
+</div>
+
 <div class="wrap">
   <header class="top">
     <div>
@@ -427,13 +537,17 @@
     <button class="btn" onclick="window.print()">Imprimer pour la porte</button>
   </div>
 
-  <div class="section-title">Prochaines sessions</div>
+  <div class="section-title">Calendrier des sessions</div>
   <div class="list" id="listBox"></div>
 
   <footer>
-    <span>Contact · marc.vasseur@polytech-lille.fr</span>
+    <div class="footer-contact">
+      <div>Messaoud Chayani · <a href="mailto:messaoud.chayani@gmail.com">messaoud.chayani@gmail.com</a></div>
+      <div class="office">Bureau F027</div>
+    </div>
     <button class="btn admin-btn" id="adminBtn">Admin</button>
   </footer>
+  <div class="credit">Conçu par M. Vasseur</div>
 </div>
 
 <!-- ---------- Admin overlay ---------- -->
@@ -546,7 +660,7 @@ function renderHero(){
         <div class="ticket-main empty-ticket">
           <div class="ticket-eyebrow">Aucune session programmée</div>
           <div class="ticket-date">Le calendrier sera mis à jour prochainement</div>
-          <div class="ticket-sub">Reviens consulter cette page ou contacte M. Vasseur.</div>
+          <div class="ticket-sub">Reviens consulter cette page ou contacte le bureau F027.</div>
         </div>
       </div>`;
     return;
@@ -603,28 +717,56 @@ function renderHero(){
   }
 }
 
+function allVisibleSorted(){
+  const t = todayMidnight();
+  return sessions
+    .filter(s => s.visible !== false)
+    .map(s => ({...s, examObj: parseDate(s.exam)}))
+    .filter(s => s.examObj)
+    .sort((a,b)=> a.examObj - b.examObj);
+}
+
 function renderList(){
   const listBox = document.getElementById('listBox');
-  const upcoming = upcomingVisible();
-  const rest = upcoming.slice(1);
+  const t = todayMidnight();
+  const all = allVisibleSorted();
+  const nextId = upcomingVisible()[0] ? upcomingVisible()[0].id : null;
 
-  if(rest.length === 0){
-    listBox.innerHTML = `<div class="empty-note">${upcoming.length <= 1 ? "Pas d'autre session programmée pour l'instant." : ''}</div>`;
+  if(all.length === 0){
+    listBox.innerHTML = `<div class="empty-note">Aucune session enregistrée pour l'instant.</div>`;
     return;
   }
 
-  listBox.innerHTML = rest.map(s=>{
+  const past = all.filter(s => s.examObj < t);
+  const future = all.filter(s => s.examObj >= t);
+
+  const rowHtml = (s, isPast) => {
     const openObj = parseDate(s.open), closeObj = parseDate(s.close);
-    const t = todayMidnight();
-    const isOpen = openObj && closeObj && t >= openObj && t <= closeObj;
+    const isOpen = !isPast && openObj && closeObj && t >= openObj && t <= closeObj;
     const publicLabel = s.public === 'apprentis' ? 'Apprentis' : 'Tous';
-    return `<div class="list-row">
+    const isNext = !isPast && s.id === nextId;
+    let stLabel, stClass;
+    if(isPast){ stLabel = 'Terminée ✓'; stClass = ''; }
+    else if(isOpen){ stLabel = isNext ? 'Prochaine · ouvertes' : 'Ouvertes'; stClass = isNext ? 'next' : 'ok'; }
+    else { stLabel = isNext ? 'Prochaine' : 'À venir'; stClass = isNext ? 'next' : 'closed'; }
+
+    return `<div class="list-row ${isPast ? 'past' : ''}">
+      <div class="node"></div>
       <div class="d">${fmtShort(s.examObj)}</div>
       <div class="pub">${publicLabel}</div>
       <div class="win">Inscriptions du ${fmtShort(openObj)} au ${fmtShort(closeObj)}</div>
-      <div class="st ${isOpen ? 'ok':'closed'}">${isOpen ? 'Ouvertes' : 'À venir / closes'}</div>
+      <div class="st ${stClass}">${stLabel}</div>
     </div>`;
-  }).join('');
+  };
+
+  let html = '';
+  html += past.map(s => rowHtml(s, true)).join('');
+  html += `<div class="today-divider"><span>Aujourd'hui — ${fmtShort(t)}</span></div>`;
+  html += future.length
+    ? future.map(s => rowHtml(s, false)).join('')
+    : `<div class="empty-note">Aucune session à venir programmée.</div>`;
+
+  listBox.innerHTML = html;
 }
 
 function renderAdminList(){
