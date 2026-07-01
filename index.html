@@ -534,6 +534,19 @@
   }
   .panel-wrap{position:relative;}
   .save-note{font-size:11.5px; color:var(--ink-soft); margin-top:10px; min-height:16px;}
+  .token-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-bottom:18px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .token-row .btn{padding:5px 10px; font-size:10px;}
 
   @media (max-width:640px){
     .ticket{flex-direction:column;}
@@ -682,7 +695,11 @@
     <button class="close-panel" id="closePanel">&times;</button>
     <h2>Calendrier TOEIC — édition</h2>
     <div class="sub">Cette partie n'est pas visible par les étudiants.</div>
-    <button class="btn" id="printBtn" style="margin-bottom:18px;">Imprimer pour la porte</button>
+    <button class="btn" id="printBtn" style="margin-bottom:10px;">Imprimer pour la porte</button>
+    <div class="token-row">
+      <span id="ghTokenStatus"></span>
+      <button class="btn" id="ghTokenBtn">Définir le token</button>
+    </div>
 
     <div class="form-grid">
       <div class="field">
@@ -717,7 +734,12 @@
 </div>
 
 <script>
-const STORE_KEY = 'toeic-sessions';
+const GH_REPO = 'marcvasseurpolytech-dot/toeic-dates';
+const GH_FILE = 'sessions.json';
+const GH_RAW = `https://raw.githubusercontent.com/${GH_REPO}/main/${GH_FILE}`;
+const GH_API = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
+const TOKEN_KEY = 'td_gh_token';
+
 let sessions = [];
 
 const monthsFR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -740,21 +762,60 @@ document.getElementById('todayLabel').textContent = 'Aujourd\'hui — ' + fmtLon
 
 async function loadSessions(){
   try{
-    const res = await window.storage.get(STORE_KEY, true);
-    sessions = res && res.value ? JSON.parse(res.value) : [];
+    const res = await fetch(GH_RAW + '?t=' + Date.now());
+    if(!res.ok) throw new Error('fetch failed');
+    sessions = await res.json();
   }catch(e){
     sessions = [];
   }
   render();
 }
 
+function b64EncodeUtf8(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
 async function saveSessions(){
+  const note = document.getElementById('saveNote');
+  const token = localStorage.getItem(TOKEN_KEY);
+  if(!token){
+    note.textContent = "Aucun token GitHub enregistré — clique sur \"Définir le token\" ci-dessus, sinon rien n'est sauvegardé.";
+    return false;
+  }
   try{
-    await window.storage.set(STORE_KEY, JSON.stringify(sessions), true);
+    const shaRes = await fetch(GH_API, { headers: { 'Authorization': 'token ' + token } });
+    const shaData = await shaRes.json();
+    if(!shaRes.ok) throw new Error(shaData.message || 'sha fetch failed');
+
+    const putRes = await fetch(GH_API, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Mise a jour calendrier TOEIC',
+        content: b64EncodeUtf8(JSON.stringify(sessions, null, 2)),
+        sha: shaData.sha
+      })
+    });
+    const putData = await putRes.json();
+    if(!putRes.ok) throw new Error(putData.message || 'save failed');
+    note.textContent = 'Enregistré sur GitHub.';
+    return true;
   }catch(e){
-    document.getElementById('saveNote').textContent = "Erreur d'enregistrement, réessaie.";
+    note.textContent = "Erreur d'enregistrement (" + e.message + "). Le token est peut-être invalide ou expiré.";
+    return false;
   }
 }
+
+function updateTokenStatus(){
+  const el = document.getElementById('ghTokenStatus');
+  if(!el) return;
+  const token = localStorage.getItem(TOKEN_KEY);
+  el.textContent = token
+    ? 'Token enregistré sur cet appareil ✓'
+    : 'Aucun token — les modifications ne seront pas sauvegardées.';
+}
+
+document.addEventListener('DOMContentLoaded', updateTokenStatus);
 
 function upcomingVisible(){
   const t = todayMidnight();
@@ -907,14 +968,22 @@ function renderAdminList(){
     btn.addEventListener('click', async ()=>{
       const id = btn.dataset.id;
       const sess = sessions.find(x=>x.id===id);
-      if(sess){ sess.visible = sess.visible === false ? true : false; await saveSessions(); render(); }
+      if(!sess) return;
+      const prev = sess.visible;
+      sess.visible = sess.visible === false ? true : false;
+      const ok = await saveSessions();
+      if(!ok) sess.visible = prev;
+      render();
     });
   });
   box.querySelectorAll('[data-action="delete"]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const id = btn.dataset.id;
+      const removed = sessions.find(x=>x.id===id);
       sessions = sessions.filter(x=>x.id!==id);
-      await saveSessions(); render();
+      const ok = await saveSessions();
+      if(!ok && removed) sessions.push(removed);
+      render();
     });
   });
 }
@@ -937,18 +1006,22 @@ document.getElementById('addBtn').addEventListener('click', async ()=>{
     note.textContent = 'Renseigne au minimum la date d\'examen et la fenêtre d\'inscription.';
     return;
   }
-  sessions.push({
-    id: 's_' + Date.now(),
-    exam, open, close, public: pub, visible
-  });
-  await saveSessions();
-  note.textContent = 'Session ajoutée.';
-  document.getElementById('f-exam').value='';
-  document.getElementById('f-open').value='';
-  document.getElementById('f-close').value='';
-  document.getElementById('f-visible').checked = true;
+  const newSession = { id: 's_' + Date.now(), exam, open, close, public: pub, visible };
+  sessions.push(newSession);
+
+  note.textContent = 'Enregistrement en cours…';
+  const ok = await saveSessions();
+
+  if(ok){
+    document.getElementById('f-exam').value='';
+    document.getElementById('f-open').value='';
+    document.getElementById('f-close').value='';
+    document.getElementById('f-visible').checked = true;
+    setTimeout(()=>{ note.textContent=''; }, 2500);
+  }else{
+    sessions = sessions.filter(s => s.id !== newSession.id);
+  }
   render();
-  setTimeout(()=>{ note.textContent=''; }, 2500);
 });
 
 /* ---------- Admin access protected by code (hash only, never the code itself) ---------- */
@@ -978,6 +1051,7 @@ async function tryUnlock(){
     document.getElementById('codePanel').style.display = 'none';
     document.getElementById('editPanel').style.display = 'block';
     document.getElementById('codeError').textContent = '';
+    updateTokenStatus();
   }else{
     document.getElementById('codeError').textContent = 'Code incorrect.';
   }
@@ -994,6 +1068,18 @@ document.getElementById('overlay').addEventListener('click', (e)=>{
 document.getElementById('printBtn').addEventListener('click', ()=>{
   hideOverlay();
   setTimeout(()=> window.print(), 150);
+});
+document.getElementById('ghTokenBtn').addEventListener('click', ()=>{
+  const current = localStorage.getItem(TOKEN_KEY);
+  const t = prompt(
+    current
+      ? "Remplacer le token GitHub enregistré sur cet appareil (laisse vide pour le supprimer) :"
+      : "Colle un token GitHub avec accès au repo toeic-dates.\nIl sera gardé uniquement dans ce navigateur, jamais dans le code de la page :"
+  );
+  if(t === null) return;
+  if(t.trim() === ''){ localStorage.removeItem(TOKEN_KEY); }
+  else{ localStorage.setItem(TOKEN_KEY, t.trim()); }
+  updateTokenStatus();
 });
 
 loadSessions();
