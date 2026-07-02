@@ -403,17 +403,48 @@
   /* ---------- Footer ---------- */
   footer{
     margin-top:56px;
-    padding-top:20px;
+    padding-top:24px;
     border-top:1px solid var(--line);
     display:flex;
     justify-content:space-between;
     align-items:center;
-    font-family:'JetBrains Mono', monospace;
-    font-size:11.5px;
-    color:var(--ink-soft);
+    gap:16px;
   }
-  .footer-contact a{color:var(--ink-soft);}
-  .footer-contact .office{margin-top:3px; opacity:0.75;}
+  .footer-contact{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    padding:14px 20px;
+    border:1px solid var(--line-gold);
+    border-radius:10px;
+    background:rgba(201,162,75,0.05);
+  }
+  .footer-contact .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+  }
+  .footer-contact .name{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:18px;
+    color:var(--ink);
+  }
+  .footer-contact a{
+    color:var(--gold-soft);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    text-decoration:underline;
+    text-decoration-color:var(--line-gold);
+  }
+  .footer-contact .office{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
   .credit{
     text-align:center;
     font-family:'JetBrains Mono', monospace;
@@ -569,6 +600,7 @@
     .notice-banner{padding:16px 16px; gap:12px;}
     .notice-banner .icon{font-size:26px;}
     .notice-banner .txt{font-size:14.5px;}
+    footer{flex-direction:column; align-items:flex-start;}
   }
 
   /* ---------- Print ---------- */
@@ -681,7 +713,9 @@
 
   <footer>
     <div class="footer-contact">
-      <div>Messaoud Chayani · <a href="mailto:messaoud.chayani@gmail.com">messaoud.chayani@gmail.com</a></div>
+      <div class="label">Contact TOEIC</div>
+      <div class="name">Messaoud Chayani</div>
+      <a href="mailto:messaoud.chayani@gmail.com">messaoud.chayani@gmail.com</a>
       <div class="office">Bureau F027</div>
     </div>
     <button class="btn admin-btn" id="adminBtn">Admin</button>
