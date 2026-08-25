@@ -224,7 +224,6 @@
     font-size:44px;
     line-height:1.05;
     margin:14px 0 4px;
-    text-transform:capitalize;
   }
   .ticket-sub{
     font-family:'Source Serif 4', serif;
@@ -795,6 +794,7 @@ function fmtLong(dateObj){
   if(!dateObj) return '';
   return daysFR[dateObj.getDay()] + ' ' + dateObj.getDate() + ' ' + monthsFR[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
 }
+function capFirst(str){ return str ? str.charAt(0).toUpperCase() + str.slice(1) : str; }
 function fmtShort(dateObj){
   if(!dateObj) return '—';
   const dd=String(dateObj.getDate()).padStart(2,'0');
@@ -909,7 +909,7 @@ function renderHero(){
       <div class="ticket-main">
         <div class="ticket-eyebrow">Prochaine session</div>
         <span class="ticket-public">${publicLabel}</span>
-        <div class="ticket-date">${fmtLong(s.examObj)}</div>
+        <div class="ticket-date">${capFirst(fmtLong(s.examObj))}</div>
         <div class="ticket-sub">Examen officiel TOEIC — Polytech Lille</div>
         <div class="ticket-rows">
           <div class="ticket-row">
