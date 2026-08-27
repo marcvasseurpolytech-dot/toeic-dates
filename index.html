@@ -545,27 +545,96 @@
   .field.checkrow{flex-direction:row; align-items:center; gap:8px; margin-top:4px;}
   .panel .btn.primary{background:var(--gold); color:var(--navy-deep); border-color:var(--gold); width:100%; margin-top:6px; padding:11px; font-weight:600;}
   .panel .btn.primary:hover{background:var(--gold-soft); border-color:var(--gold-soft); color:var(--navy-deep);}
-  .admin-list{margin-top:24px; border-top:1px solid var(--line);}
-  .admin-row{
-    display:grid;
-    grid-template-columns:1fr 1fr auto auto auto;
+  .admin-list{margin-top:24px; border-top:1px solid var(--line); padding-top:4px;}
+  .admin-card{
+    display:flex;
+    flex-direction:column;
     gap:10px;
-    align-items:center;
-    padding:10px 2px;
-    border-bottom:1px solid var(--line);
-    font-size:13px;
+    padding:16px;
+    margin:14px 0;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(255,255,255,0.02);
   }
-  .admin-row .mini{font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--ink-soft);}
+  .admin-card.is-past{opacity:0.55;}
+  .admin-card-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .admin-card-date{
+    font-family:'Playfair Display', serif;
+    font-weight:800;
+    font-size:19px;
+    color:var(--ink);
+    line-height:1.25;
+  }
+  .admin-card-date .dow{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:500;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:2px;
+  }
+  .admin-badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:4px 9px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .admin-badge.next{border-color:var(--gold); color:var(--gold-soft);}
+  .admin-badge.open{border-color:var(--ok, #6f9c76); color:var(--ok, #6f9c76);}
+  .admin-badge.closed{border-color:var(--closed); color:var(--closed);}
+  .admin-badge.hidden{border-color:var(--ink-soft); color:var(--ink-soft);}
+  .admin-card-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 16px;
+  }
+  .admin-field{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .admin-field .k{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .admin-field .v{
+    font-size:13px;
+    color:var(--ink);
+  }
+  .admin-field .v.muted{color:var(--ink-soft); font-style:italic;}
+  .admin-card-actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    border-top:1px solid var(--line);
+    padding-top:10px;
+    margin-top:2px;
+  }
   .icon-btn{
-    background:none; border:none; cursor:pointer;
+    background:none; border:1px solid var(--line); cursor:pointer;
     font-family:'JetBrains Mono', monospace;
     font-size:11px;
     color:var(--ink-soft);
-    padding:4px 8px;
-    border-radius:5px;
+    padding:5px 10px;
+    border-radius:6px;
   }
   .icon-btn:hover{background:var(--line); color:var(--ink);}
-  .icon-btn.danger:hover{background:rgba(155,74,63,0.14); color:var(--closed);}
+  .icon-btn.danger:hover{background:rgba(155,74,63,0.14); color:var(--closed); border-color:var(--closed);}
   .close-panel{
     position:absolute; top:14px; right:16px;
     background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink-soft);
@@ -595,7 +664,7 @@
     .list-row .win, .list-row .pub, .list-row .st{grid-column:2;}
     .list-row .st{text-align:left;}
     .form-grid{grid-template-columns:1fr;}
-    .admin-row{grid-template-columns:1fr; text-align:left;}
+    .admin-card-grid{grid-template-columns:1fr;}
     .notice-banner{padding:16px 16px; gap:12px;}
     .notice-banner .icon{font-size:26px;}
     .notice-banner .txt{font-size:14.5px;}
@@ -968,15 +1037,67 @@ function renderAdminList(){
     box.innerHTML = '<div class="empty-note">Aucune session enregistrée.</div>';
     return;
   }
+  const t = todayMidnight();
   const sorted = [...sessions].sort((a,b)=> parseDate(a.exam) - parseDate(b.exam));
+  const nextId = sorted
+    .map(s=>({...s, examObj: parseDate(s.exam)}))
+    .filter(s => s.visible !== false && s.examObj && s.examObj >= t)
+    .sort((a,b)=> a.examObj - b.examObj)[0]?.id;
+
   box.innerHTML = sorted.map(s=>{
-    const publicLabel = s.public === 'apprentis' ? 'Apprentis' : 'Tous';
-    return `<div class="admin-row" data-id="${s.id}">
-      <div><strong>${fmtShort(parseDate(s.exam))}</strong></div>
-      <div class="mini">Insc. ${fmtShort(parseDate(s.open))} → ${fmtShort(parseDate(s.close))} · ${publicLabel}</div>
-      <div class="mini">${s.visible === false ? 'Masquée' : 'Visible'}</div>
-      <button class="icon-btn" data-action="toggle" data-id="${s.id}">${s.visible === false ? 'Afficher' : 'Masquer'}</button>
-      <button class="icon-btn danger" data-action="delete" data-id="${s.id}">Supprimer</button>
+    const examObj = parseDate(s.exam);
+    const openObj = parseDate(s.open);
+    const closeObj = parseDate(s.close);
+    const isPast = examObj && examObj < t;
+    const isNext = s.id === nextId;
+    const publicLabel = s.public === 'apprentis' ? 'Apprentis uniquement' : 'Tous les étudiants';
+
+    let regStatus, regClass;
+    if(!openObj || !closeObj){ regStatus = 'Fenêtre non définie'; regClass = 'hidden'; }
+    else if(t < openObj){ regStatus = 'Pas encore ouvertes'; regClass = 'closed'; }
+    else if(t > closeObj){ regStatus = 'Inscriptions closes'; regClass = 'closed'; }
+    else{ regStatus = 'Inscriptions ouvertes'; regClass = 'open'; }
+
+    const badges = [];
+    if(isPast) badges.push('<span class="admin-badge">Passée</span>');
+    else if(isNext) badges.push('<span class="admin-badge next">Prochaine</span>');
+    badges.push(`<span class="admin-badge ${regClass}">${regStatus}</span>`);
+    if(s.visible === false) badges.push('<span class="admin-badge hidden">Masquée</span>');
+
+    return `<div class="admin-card${isPast ? ' is-past' : ''}" data-id="${s.id}">
+      <div class="admin-card-top">
+        <div class="admin-card-date">
+          <span class="dow">${examObj ? daysFR[examObj.getDay()] : ''}</span>
+          ${fmtShort(examObj)}
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">${badges.join('')}</div>
+      </div>
+      <div class="admin-card-grid">
+        <div class="admin-field">
+          <span class="k">Quand</span>
+          <span class="v">${capFirst(fmtLong(examObj))}</span>
+        </div>
+        <div class="admin-field">
+          <span class="k">Qui</span>
+          <span class="v">${publicLabel}</span>
+        </div>
+        <div class="admin-field">
+          <span class="k">Ouverture des inscriptions</span>
+          <span class="v${openObj ? '' : ' muted'}">${openObj ? fmtShort(openObj) : 'Non définie'}</span>
+        </div>
+        <div class="admin-field">
+          <span class="k">Fermeture des inscriptions</span>
+          <span class="v${closeObj ? '' : ' muted'}">${closeObj ? fmtShort(closeObj) : 'Non définie'}</span>
+        </div>
+        <div class="admin-field" style="grid-column:1 / -1;">
+          <span class="k">Visibilité côté étudiants</span>
+          <span class="v">${s.visible === false ? 'Masquée — n\'apparaît pas sur la page publique' : 'Visible sur la page publique'}</span>
+        </div>
+      </div>
+      <div class="admin-card-actions">
+        <button class="icon-btn" data-action="toggle" data-id="${s.id}">${s.visible === false ? 'Afficher' : 'Masquer'}</button>
+        <button class="icon-btn danger" data-action="delete" data-id="${s.id}">Supprimer</button>
+      </div>
     </div>`;
   }).join('');
 
