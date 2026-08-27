@@ -740,10 +740,6 @@
     <h2>Calendrier TOEIC — édition</h2>
     <div class="sub">Cette partie n'est pas visible par les étudiants.</div>
     <button class="btn" id="printBtn" style="margin-bottom:10px;">Imprimer pour la porte</button>
-    <div class="token-row">
-      <span id="ghTokenStatus"></span>
-      <button class="btn" id="ghTokenBtn">Définir le token</button>
-    </div>
 
     <div class="form-grid">
       <div class="field">
@@ -781,10 +777,9 @@
 const GH_REPO = 'marcvasseurpolytech-dot/toeic-dates';
 const GH_FILE = 'sessions.json';
 const GH_RAW = `https://raw.githubusercontent.com/${GH_REPO}/main/${GH_FILE}`;
-const GH_API = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
-const TOKEN_KEY = 'td_gh_token';
 
 let sessions = [];
+let adminCode = '';
 
 const monthsFR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const daysFR = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
@@ -822,45 +817,21 @@ function b64EncodeUtf8(str){
 
 async function saveSessions(){
   const note = document.getElementById('saveNote');
-  const token = localStorage.getItem(TOKEN_KEY);
-  if(!token){
-    note.textContent = "Aucun token GitHub enregistré — clique sur \"Définir le token\" ci-dessus, sinon rien n'est sauvegardé.";
-    return false;
-  }
   try{
-    const shaRes = await fetch(GH_API, { headers: { 'Authorization': 'token ' + token } });
-    const shaData = await shaRes.json();
-    if(!shaRes.ok) throw new Error(shaData.message || 'sha fetch failed');
-
-    const putRes = await fetch(GH_API, {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Mise a jour calendrier TOEIC',
-        content: b64EncodeUtf8(JSON.stringify(sessions, null, 2)),
-        sha: shaData.sha
-      })
+    const res = await fetch('/api/save-sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: adminCode, sessions })
     });
-    const putData = await putRes.json();
-    if(!putRes.ok) throw new Error(putData.message || 'save failed');
+    const data = await res.json();
+    if(!res.ok || !data.ok) throw new Error(data.error || 'save failed');
     note.textContent = 'Enregistré sur GitHub.';
     return true;
   }catch(e){
-    note.textContent = "Erreur d'enregistrement (" + e.message + "). Le token est peut-être invalide ou expiré.";
+    note.textContent = "Erreur d'enregistrement (" + e.message + ").";
     return false;
   }
 }
-
-function updateTokenStatus(){
-  const el = document.getElementById('ghTokenStatus');
-  if(!el) return;
-  const token = localStorage.getItem(TOKEN_KEY);
-  el.textContent = token
-    ? 'Token enregistré sur cet appareil ✓'
-    : 'Aucun token — les modifications ne seront pas sauvegardées.';
-}
-
-document.addEventListener('DOMContentLoaded', updateTokenStatus);
 
 function upcomingVisible(){
   const t = todayMidnight();
@@ -1093,10 +1064,10 @@ async function tryUnlock(){
   const val = document.getElementById('codeInput').value;
   const hash = await sha256Hex(val);
   if(hash === ADMIN_HASH){
+    adminCode = val;
     document.getElementById('codePanel').style.display = 'none';
     document.getElementById('editPanel').style.display = 'block';
     document.getElementById('codeError').textContent = '';
-    updateTokenStatus();
   }else{
     document.getElementById('codeError').textContent = 'Code incorrect.';
   }
@@ -1113,18 +1084,6 @@ document.getElementById('overlay').addEventListener('click', (e)=>{
 document.getElementById('printBtn').addEventListener('click', ()=>{
   hideOverlay();
   setTimeout(()=> window.print(), 150);
-});
-document.getElementById('ghTokenBtn').addEventListener('click', ()=>{
-  const current = localStorage.getItem(TOKEN_KEY);
-  const t = prompt(
-    current
-      ? "Remplacer le token GitHub enregistré sur cet appareil (laisse vide pour le supprimer) :"
-      : "Colle un token GitHub avec accès au repo toeic-dates.\nIl sera gardé uniquement dans ce navigateur, jamais dans le code de la page :"
-  );
-  if(t === null) return;
-  if(t.trim() === ''){ localStorage.removeItem(TOKEN_KEY); }
-  else{ localStorage.setItem(TOKEN_KEY, t.trim()); }
-  updateTokenStatus();
 });
 
 loadSessions();
