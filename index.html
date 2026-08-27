@@ -260,6 +260,32 @@
   .dot.open{background:#7FD79A;}
   .dot.closed{background:#E28C7F;}
 
+  .register-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    margin-top:18px;
+    padding:13px 22px;
+    background:linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+    color:var(--navy-deep);
+    font-family:'Source Serif 4', serif;
+    font-weight:700;
+    font-size:15px;
+    text-decoration:none;
+    border-radius:8px;
+    box-shadow:0 4px 14px rgba(199,161,90,0.28);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .register-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 18px rgba(199,161,90,0.4);
+  }
+  .register-btn .arrow{
+    font-size:17px;
+    transition:transform 0.15s ease;
+  }
+  .register-btn:hover .arrow{transform:translateX(3px);}
+
   .ticket-stub{
     width:190px;
     flex-shrink:0;
@@ -943,6 +969,8 @@ function renderHero(){
   else { statusLabel='—'; statusDot='closed'; }
 
   const publicLabel = s.public === 'apprentis' ? 'Apprentis uniquement' : 'Tous les étudiants';
+  const registerUrl = 'https://applications.polytech-lille.fr/gestionToeic/';
+  const showRegisterBtn = isOpen || isBefore;
 
   box.innerHTML = `
     <div class="ticket">
@@ -965,6 +993,7 @@ function renderHero(){
             <div class="status"><span class="dot ${statusDot}"></span>${statusLabel}</div>
           </div>
         </div>
+        ${showRegisterBtn ? `<a class="register-btn" href="${registerUrl}" target="_blank" rel="noopener">Pour vous inscrire c'est ici <span class="arrow">→</span></a>` : ''}
       </div>
       <div class="ticket-stub">
         <div class="qr-box" id="qrBox"></div>
