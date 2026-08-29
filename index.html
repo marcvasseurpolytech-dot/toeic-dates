@@ -224,10 +224,10 @@
   }
   .ticket-date{
     font-family:'Playfair Display', serif;
-    font-weight:900;
-    font-size:44px;
-    line-height:1.05;
-    margin:14px 0 4px;
+    font-weight:800;
+    font-size:26px;
+    line-height:1.15;
+    margin:12px 0 4px;
   }
   .ticket-sub{
     font-family:'Source Serif 4', serif;
@@ -238,27 +238,52 @@
   .ticket-rows{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:14px 24px;
+    gap:12px;
     margin-top:6px;
   }
+  .ticket-row{
+    padding:12px 14px;
+    border:1px solid var(--line-gold);
+    border-radius:10px;
+    background:rgba(255,255,255,0.03);
+  }
   .ticket-row .lbl{
+    display:flex;
+    align-items:center;
+    gap:6px;
     font-family:'JetBrains Mono', monospace;
     font-size:10px;
-    letter-spacing:0.1em;
+    letter-spacing:0.09em;
     text-transform:uppercase;
-    color:rgba(252,250,243,0.55);
-    margin-bottom:3px;
+    color:var(--gold-soft);
+    margin-bottom:6px;
+  }
+  .ticket-row .lbl::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--gold-soft);
+    flex-shrink:0;
   }
   .ticket-row .val{
-    font-size:15px;
-    font-weight:500;
+    font-size:17px;
+    font-weight:700;
+    color:var(--paper);
+  }
+  .ticket-row.status-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.02);
   }
   .ticket-row .status{
     display:inline-flex;
     align-items:center;
-    gap:6px;
+    gap:7px;
     font-family:'JetBrains Mono', monospace;
-    font-size:12px;
+    font-size:12.5px;
+    letter-spacing:0.03em;
   }
   .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
   .dot.open{background:#7FD79A;}
@@ -742,9 +767,11 @@
     .ticket-audience{color:var(--ink) !important;}
     .ticket-audience strong{color:var(--gold-soft) !important;}
     .ticket-audience::before, .ticket-audience::after{background:var(--line-gold) !important;}
-    .ticket-date{color:var(--navy) !important; font-size:52px;}
+    .ticket-date{color:var(--navy) !important; font-size:30px;}
     .ticket-sub{color:var(--ink-soft) !important;}
+    .ticket-row{border-color:var(--line) !important; background:transparent !important;}
     .ticket-row .lbl{color:var(--ink-soft) !important;}
+    .ticket-row .lbl::before{background:var(--gold) !important;}
     .ticket-row .val{color:var(--navy) !important;}
     .status{color:var(--ink) !important;}
     .dot.open{background:var(--ok) !important;}
@@ -978,15 +1005,14 @@ function renderHero(){
         <div class="ticket-sub">Examen officiel TOEIC — Polytech Lille</div>
         <div class="ticket-rows">
           <div class="ticket-row">
-            <div class="lbl">Ouverture inscriptions</div>
+            <div class="lbl">Ouverture des inscriptions</div>
             <div class="val">${fmtShort(openObj)}</div>
           </div>
           <div class="ticket-row">
-            <div class="lbl">Fermeture inscriptions</div>
+            <div class="lbl">Fermeture des inscriptions</div>
             <div class="val">${fmtShort(closeObj)}</div>
           </div>
-          <div class="ticket-row" style="grid-column:1/-1;">
-            <div class="lbl">Statut</div>
+          <div class="ticket-row status-row" style="grid-column:1/-1;">
             <div class="status"><span class="dot ${statusDot}"></span>${statusLabel}</div>
           </div>
         </div>
