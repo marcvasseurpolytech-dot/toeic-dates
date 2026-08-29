@@ -290,6 +290,20 @@
   }
   .register-btn:hover .arrow{transform:translateX(3px);}
 
+  .register-note{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:18px;
+    padding:11px 16px;
+    border:1px dashed var(--line-gold);
+    border-radius:8px;
+    font-family:'Source Serif 4', serif;
+    font-style:italic;
+    font-size:13.5px;
+    color:rgba(252,250,243,0.7);
+  }
+
   .empty-ticket{
     padding:50px 30px;
     text-align:center;
@@ -954,7 +968,6 @@ function renderHero(){
     ? 'Cette session est ouverte <strong>aux apprentis uniquement</strong>.'
     : 'Cette session est ouverte à <strong>tous les étudiants</strong>.';
   const registerUrl = 'https://applications.polytech-lille.fr/gestionToeic/';
-  const showRegisterBtn = isOpen || isBefore;
 
   box.innerHTML = `
     <div class="ticket">
@@ -977,7 +990,10 @@ function renderHero(){
             <div class="status"><span class="dot ${statusDot}"></span>${statusLabel}</div>
           </div>
         </div>
-        ${showRegisterBtn ? `<a class="register-btn" href="${registerUrl}" target="_blank" rel="noopener">Pour vous inscrire c'est ici <span class="arrow">→</span></a>` : ''}
+        ${isOpen
+          ? `<a class="register-btn" href="${registerUrl}" target="_blank" rel="noopener">Pour vous inscrire c'est ici <span class="arrow">→</span></a>`
+          : `<div class="register-note">${isBefore ? 'Le bouton d\u2019inscription apparaîtra ici dès l\u2019ouverture des inscriptions.' : 'Les inscriptions pour cette session sont closes.'}</div>`
+        }
       </div>
     </div>`;
 }
