@@ -6,7 +6,6 @@
 <title>TOEIC — Session officielle | Polytech Lille</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --navy:#1C2C4C;
@@ -191,14 +190,6 @@
     padding:34px 30px;
     position:relative;
   }
-  .ticket-main::after{
-    content:"";
-    position:absolute; top:0; right:0; bottom:0;
-    width:1px;
-    background-image: linear-gradient(var(--paper) 60%, transparent 0%);
-    background-size: 2px 14px;
-    opacity:0.25;
-  }
   .ticket-eyebrow{
     font-family:'JetBrains Mono', monospace;
     font-size:11px;
@@ -299,32 +290,6 @@
   }
   .register-btn:hover .arrow{transform:translateX(3px);}
 
-  .ticket-stub{
-    width:190px;
-    flex-shrink:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    padding:26px 18px;
-    background:rgba(0,0,0,0.14);
-  }
-  .qr-box{
-    background:var(--paper);
-    padding:8px;
-    border-radius:8px;
-  }
-  .qr-box img, .qr-box canvas{display:block; width:120px; height:120px;}
-  .stub-label{
-    font-family:'JetBrains Mono', monospace;
-    font-size:10px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    text-align:center;
-    color:rgba(252,250,243,0.65);
-  }
-
   .empty-ticket{
     padding:50px 30px;
     text-align:center;
@@ -401,6 +366,14 @@
   .st.ok{color:var(--ok);}
   .st.closed{color:var(--closed);}
   .st.next{color:var(--gold); font-weight:600;}
+  .st .countdown{
+    display:block;
+    font-size:9.5px;
+    letter-spacing:0.04em;
+    color:var(--gold-soft);
+    margin-top:2px;
+    font-weight:500;
+  }
 
   /* Sessions passées : estompées, révolues */
   .list-row.past{opacity:0.45;}
@@ -696,7 +669,6 @@
 
   @media (max-width:640px){
     .ticket{flex-direction:column;}
-    .ticket-stub{width:100%; flex-direction:row; justify-content:center;}
     .ticket-rows{grid-template-columns:1fr 1fr;}
     .list-row{grid-template-columns:16px 1fr; gap:4px 10px;}
     .list-row .node{align-self:start; margin-top:6px;}
@@ -763,10 +735,6 @@
     .status{color:var(--ink) !important;}
     .dot.open{background:var(--ok) !important;}
     .dot.closed{background:var(--closed) !important;}
-    .ticket-stub{background:rgba(20,33,61,0.05) !important;}
-    .stub-label{color:var(--ink-soft) !important;}
-
-    .qr-box{background:#fff; border:1px solid var(--navy);}
 
     .section-title{color:var(--navy) !important; border-bottom:1px solid var(--line);}
     .list-row{border-color:var(--line);}
@@ -955,7 +923,6 @@ function upcomingVisible(){
 function renderHero(){
   const box = document.getElementById('heroTicket');
   const upcoming = upcomingVisible();
-  const pageUrl = window.location.href;
 
   if(upcoming.length === 0){
     box.innerHTML = `
@@ -1012,17 +979,7 @@ function renderHero(){
         </div>
         ${showRegisterBtn ? `<a class="register-btn" href="${registerUrl}" target="_blank" rel="noopener">Pour vous inscrire c'est ici <span class="arrow">→</span></a>` : ''}
       </div>
-      <div class="ticket-stub">
-        <div class="qr-box" id="qrBox"></div>
-        <div class="stub-label">Scanner pour<br>consulter sur mobile</div>
-      </div>
     </div>`;
-
-  const qrBox = document.getElementById('qrBox');
-  if(qrBox && window.QRCode){
-    qrBox.innerHTML = '';
-    new QRCode(qrBox, { text: pageUrl, width:120, height:120, colorDark:'#14213D', colorLight:'#FCFAF3' });
-  }
 }
 
 function allVisibleSorted(){
@@ -1058,12 +1015,22 @@ function renderList(){
     else if(isOpen){ stLabel = isNext ? 'Prochaine · ouvertes' : 'Ouvertes'; stClass = isNext ? 'next' : 'ok'; }
     else { stLabel = isNext ? 'Prochaine' : 'À venir'; stClass = isNext ? 'next' : 'closed'; }
 
+    let countdownHtml = '';
+    if(isNext){
+      const diffDays = Math.round((s.examObj - t) / 86400000);
+      let countdownText;
+      if(diffDays <= 0) countdownText = "aujourd'hui";
+      else if(diffDays === 1) countdownText = 'dans 1 jour';
+      else countdownText = `dans ${diffDays} jours`;
+      countdownHtml = `<span class="countdown">${countdownText}</span>`;
+    }
+
     return `<div class="list-row ${isPast ? 'past' : ''}">
       <div class="node"></div>
       <div class="d">${fmtShort(s.examObj)}</div>
       <div class="pub">${publicLabel}</div>
       <div class="win">Inscriptions du ${fmtShort(openObj)} au ${fmtShort(closeObj)}</div>
-      <div class="st ${stClass}">${stLabel}</div>
+      <div class="st ${stClass}">${stLabel}${countdownHtml}</div>
     </div>`;
   };
 
