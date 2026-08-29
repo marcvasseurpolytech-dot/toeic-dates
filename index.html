@@ -845,11 +845,27 @@
       print-color-adjust:exact !important;
     }
     body.printing-poster .door-poster{
-      background:var(--navy-deep) !important;
-      color:var(--paper) !important;
+      background:#fff !important;
+      background-image:none !important;
+      color:var(--navy) !important;
       -webkit-print-color-adjust:exact !important;
       print-color-adjust:exact !important;
     }
+    body.printing-poster .dp-frame{
+      background:#fff !important;
+      box-shadow:none !important;
+    }
+    body.printing-poster .dp-title{color:var(--navy) !important;}
+    body.printing-poster .dp-title em{color:var(--gold) !important;}
+    body.printing-poster .dp-audience{color:var(--ink) !important;}
+    body.printing-poster .dp-audience strong{color:var(--gold) !important;}
+    body.printing-poster .dp-date{color:var(--navy) !important;}
+    body.printing-poster .dp-date-sub{color:var(--ink-soft) !important;}
+    body.printing-poster .dp-row{background:#fff !important;}
+    body.printing-poster .dp-row .val{color:var(--navy) !important;}
+    body.printing-poster .dp-footer{color:var(--ink-soft) !important;}
+    body.printing-poster .dp-footer strong{color:var(--gold) !important;}
+    body.printing-poster .dp-empty{color:var(--ink) !important;}
 
     :root{
       --navy:#14213D;
