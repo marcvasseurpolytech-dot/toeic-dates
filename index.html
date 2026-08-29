@@ -23,8 +23,7 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  html{color-scheme:dark;}
-  body{
+  html{color-scheme:dark;}  body{
     background:
       radial-gradient(1200px 600px at 15% -10%, rgba(201,162,75,0.07), transparent 60%),
       var(--navy-deep);
@@ -32,6 +31,8 @@
     font-family:'Source Serif 4', serif;
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
   }
   .wrap{max-width:900px;margin:0 auto;padding:0 24px 96px;}
 
@@ -722,7 +723,134 @@
   }
 
   /* ---------- Print ---------- */
+  /* ---------- Door poster (print) ---------- */
+  #doorPoster{display:none;}
+  .door-poster{
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    padding:60px 50px;
+    background:var(--navy-deep);
+    background-image:radial-gradient(900px 500px at 50% -10%, rgba(201,162,75,0.16), transparent 60%);
+    color:var(--paper);
+    text-align:center;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .dp-frame{
+    width:100%;
+    max-width:680px;
+    border:2px solid var(--gold);
+    border-radius:22px;
+    padding:52px 44px;
+    background:rgba(255,255,255,0.02);
+    box-shadow:0 0 0 1px rgba(201,162,75,0.15) inset;
+  }
+  .dp-kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+  }
+  .dp-title{
+    font-family:'Playfair Display', serif;
+    font-weight:900;
+    font-size:34px;
+    margin:10px 0 6px;
+    color:var(--paper);
+  }
+  .dp-title em{color:var(--gold); font-style:normal;}
+  .dp-audience{
+    font-family:'Source Serif 4', serif;
+    font-style:italic;
+    font-size:15px;
+    color:rgba(252,250,243,0.85);
+    margin-bottom:30px;
+  }
+  .dp-audience strong{font-style:normal; font-weight:700; color:var(--gold-soft);}
+  .dp-date{
+    font-family:'Playfair Display', serif;
+    font-weight:900;
+    font-size:52px;
+    line-height:1.1;
+    color:var(--gold-soft);
+    margin-bottom:8px;
+  }
+  .dp-date-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:36px;
+  }
+  .dp-rows{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:8px;
+  }
+  .dp-row{
+    padding:18px 16px;
+    border:1.5px solid var(--line-gold);
+    border-radius:14px;
+    background:rgba(255,255,255,0.03);
+  }
+  .dp-row .lbl{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--gold-soft);
+    margin-bottom:8px;
+  }
+  .dp-row .val{
+    font-family:'Playfair Display', serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--paper);
+  }
+  .dp-footer{
+    margin-top:38px;
+    padding-top:24px;
+    border-top:1px solid var(--line-gold);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .dp-footer strong{color:var(--gold-soft); font-weight:600;}
+  .dp-empty{
+    font-family:'Source Serif 4', serif;
+    font-style:italic;
+    font-size:18px;
+    color:rgba(252,250,243,0.75);
+  }
+
   @media print{
+    @page{ size:A4 portrait; margin:0; }
+
+    body.printing-poster > *:not(#doorPoster){display:none !important;}
+    body.printing-poster #doorPoster{
+      display:block !important;
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+    }
+    body.printing-poster .door-poster{
+      background:var(--navy-deep) !important;
+      color:var(--paper) !important;
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+    }
+
     :root{
       --navy:#14213D;
       --navy-deep:#0A1424;
@@ -891,6 +1019,8 @@
     <div class="admin-list" id="adminList"></div>
   </div>
 </div>
+
+<div id="doorPoster"><div class="door-poster" id="doorPosterContent"></div></div>
 
 <script>
 const GH_REPO = 'marcvasseurpolytech-dot/toeic-dates';
@@ -1180,10 +1310,60 @@ function renderAdminList(){
   });
 }
 
+function renderDoorPoster(){
+  const box = document.getElementById('doorPosterContent');
+  const upcoming = upcomingVisible();
+
+  if(upcoming.length === 0){
+    box.innerHTML = `
+      <div class="dp-frame">
+        <div class="dp-kicker">Polytech Lille — Centre d'examen TOEIC</div>
+        <div class="dp-title">Session <em>TOEIC</em></div>
+        <div class="dp-empty" style="margin-top:20px;">Aucune session programmée pour le moment.</div>
+        <div class="dp-footer">
+          <span>Contact TOEIC — <strong>Messaoud Chayani</strong></span>
+          <span>messaoud.chayani@polytech-lille.fr — Bureau F027</span>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const s = upcoming[0];
+  const openObj = parseDate(s.open);
+  const closeObj = parseDate(s.close);
+  const audienceSentence = s.public === 'apprentis'
+    ? 'Cette session est ouverte <strong>aux apprentis uniquement</strong>.'
+    : 'Cette session est ouverte à <strong>tous les étudiants</strong>.';
+
+  box.innerHTML = `
+    <div class="dp-frame">
+      <div class="dp-kicker">Polytech Lille — Centre d'examen TOEIC</div>
+      <div class="dp-title">Prochaine session <em>TOEIC</em></div>
+      <div class="dp-audience">${audienceSentence}</div>
+      <div class="dp-date">${capFirst(fmtLong(s.examObj))}</div>
+      <div class="dp-date-sub">Examen officiel TOEIC</div>
+      <div class="dp-rows">
+        <div class="dp-row">
+          <div class="lbl">Ouverture des inscriptions</div>
+          <div class="val">${fmtShort(openObj)}</div>
+        </div>
+        <div class="dp-row">
+          <div class="lbl">Fermeture des inscriptions</div>
+          <div class="val">${fmtShort(closeObj)}</div>
+        </div>
+      </div>
+      <div class="dp-footer">
+        <span>Contact TOEIC — <strong>Messaoud Chayani</strong></span>
+        <span>messaoud.chayani@polytech-lille.fr — Bureau F027</span>
+      </div>
+    </div>`;
+}
+
 function render(){
   renderHero();
   renderList();
   renderAdminList();
+  renderDoorPoster();
 }
 
 document.getElementById('addBtn').addEventListener('click', async ()=>{
@@ -1258,8 +1438,13 @@ document.getElementById('overlay').addEventListener('click', (e)=>{
   if(e.target.id === 'overlay') hideOverlay();
 });
 document.getElementById('printBtn').addEventListener('click', ()=>{
+  renderDoorPoster();
   hideOverlay();
+  document.body.classList.add('printing-poster');
   setTimeout(()=> window.print(), 150);
+});
+window.addEventListener('afterprint', ()=>{
+  document.body.classList.remove('printing-poster');
 });
 
 loadSessions();
