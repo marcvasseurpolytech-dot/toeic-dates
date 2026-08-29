@@ -815,9 +815,32 @@
     font-weight:700;
     color:var(--paper);
   }
+  .dp-qr-block{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    margin-top:30px;
+    padding-top:26px;
+    border-top:1px solid var(--line-gold);
+  }
+  .dp-qr-box{
+    background:var(--paper);
+    padding:10px;
+    border-radius:10px;
+    border:1.5px solid var(--gold);
+  }
+  .dp-qr-box img, .dp-qr-box canvas{display:block; width:130px; height:130px;}
+  .dp-qr-label{
+    font-family:'Source Serif 4', serif;
+    font-style:italic;
+    font-size:13px;
+    color:rgba(252,250,243,0.85);
+  }
+  .dp-qr-label strong{font-style:normal; font-weight:700; color:var(--gold-soft);}
   .dp-footer{
-    margin-top:38px;
-    padding-top:24px;
+    margin-top:26px;
+    padding-top:20px;
     border-top:1px solid var(--line-gold);
     font-family:'JetBrains Mono', monospace;
     font-size:11px;
@@ -891,6 +914,10 @@
     body.printing-poster .dp-row{background:#fff !important;}
     body.printing-poster .dp-row .val{color:var(--navy) !important;}
     body.printing-poster .dp-footer{color:var(--ink-soft) !important;}
+    body.printing-poster .dp-qr-block{border-color:var(--line-gold) !important;}
+    body.printing-poster .dp-qr-box{background:#fff !important; border-color:var(--gold) !important;}
+    body.printing-poster .dp-qr-label{color:var(--ink) !important;}
+    body.printing-poster .dp-qr-label strong{color:var(--gold) !important;}
     body.printing-poster .dp-footer strong{color:var(--gold) !important;}
     body.printing-poster .dp-empty{color:var(--ink) !important;}
     body.printing-poster .dp-caveat{background:rgba(173,127,46,0.07) !important; border-color:var(--gold) !important;}
@@ -965,6 +992,7 @@
     .today-divider span{color:var(--gold-soft) !important;}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -1060,6 +1088,7 @@
       </div>
     </div>
     <button class="btn primary" id="addBtn">Ajouter au calendrier</button>
+    <button class="btn" id="cancelEditBtn" style="display:none; margin-top:8px;">Annuler la modification</button>
     <div class="save-note" id="saveNote"></div>
 
     <div class="admin-list" id="adminList"></div>
@@ -1326,11 +1355,20 @@ function renderAdminList(){
         </div>
       </div>
       <div class="admin-card-actions">
+        <button class="icon-btn" data-action="edit" data-id="${s.id}">Modifier</button>
         <button class="icon-btn" data-action="toggle" data-id="${s.id}">${s.visible === false ? 'Afficher' : 'Masquer'}</button>
         <button class="icon-btn danger" data-action="delete" data-id="${s.id}">Supprimer</button>
       </div>
     </div>`;
   }).join('');
+
+  box.querySelectorAll('[data-action="edit"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const sess = sessions.find(x=>x.id===btn.dataset.id);
+      if(!sess) return;
+      startEditSession(sess);
+    });
+  });
 
   box.querySelectorAll('[data-action="toggle"]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
@@ -1408,11 +1446,27 @@ function renderDoorPoster(){
           <div class="val">${fmtShort(closeObj)}</div>
         </div>
       </div>
+      <div class="dp-qr-block">
+        <div class="dp-qr-box" id="dpQrBox"></div>
+        <div class="dp-qr-label">Scannez pour <strong>vous inscrire</strong></div>
+      </div>
       <div class="dp-footer">
         <span>Contact TOEIC — <strong>Messaoud Chayani</strong></span>
         <span>messaoud.chayani@polytech-lille.fr — Bureau F027</span>
       </div>
     </div>`;
+
+  const qrBox = document.getElementById('dpQrBox');
+  if(qrBox && window.QRCode){
+    qrBox.innerHTML = '';
+    new QRCode(qrBox, {
+      text: 'https://applications.polytech-lille.fr/gestionToeic/',
+      width: 130,
+      height: 130,
+      colorDark: '#1C2C4C',
+      colorLight: '#FCFAF3'
+    });
+  }
 }
 
 function render(){
@@ -1421,6 +1475,8 @@ function render(){
   renderAdminList();
   renderDoorPoster();
 }
+
+let editingId = null;
 
 document.getElementById('addBtn').addEventListener('click', async ()=>{
   const exam = document.getElementById('f-exam').value;
@@ -1434,6 +1490,27 @@ document.getElementById('addBtn').addEventListener('click', async ()=>{
     note.textContent = 'Renseigne au minimum la date d\'examen et la fenêtre d\'inscription.';
     return;
   }
+
+  if(editingId){
+    const sess = sessions.find(x=>x.id===editingId);
+    if(!sess){ resetForm(); render(); return; }
+    const backup = {...sess};
+    sess.exam = exam; sess.open = open; sess.close = close; sess.public = pub; sess.visible = visible;
+
+    note.textContent = 'Enregistrement en cours…';
+    const ok = await saveSessions();
+
+    if(ok){
+      note.textContent = 'Session modifiée.';
+      resetForm();
+      setTimeout(()=>{ note.textContent=''; }, 2500);
+    }else{
+      Object.assign(sess, backup);
+    }
+    render();
+    return;
+  }
+
   const newSession = { id: 's_' + Date.now(), exam, open, close, public: pub, visible };
   sessions.push(newSession);
 
@@ -1441,15 +1518,41 @@ document.getElementById('addBtn').addEventListener('click', async ()=>{
   const ok = await saveSessions();
 
   if(ok){
-    document.getElementById('f-exam').value='';
-    document.getElementById('f-open').value='';
-    document.getElementById('f-close').value='';
-    document.getElementById('f-visible').checked = true;
+    resetForm();
     setTimeout(()=>{ note.textContent=''; }, 2500);
   }else{
     sessions = sessions.filter(s => s.id !== newSession.id);
   }
   render();
+});
+
+function startEditSession(sess){
+  editingId = sess.id;
+  document.getElementById('f-exam').value = sess.exam || '';
+  document.getElementById('f-open').value = sess.open || '';
+  document.getElementById('f-close').value = sess.close || '';
+  document.getElementById('f-public').value = sess.public || 'tous';
+  document.getElementById('f-visible').checked = sess.visible !== false;
+  document.getElementById('addBtn').textContent = 'Enregistrer les modifications';
+  document.getElementById('cancelEditBtn').style.display = 'inline-block';
+  document.getElementById('saveNote').textContent = '';
+  document.querySelector('.form-grid').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function resetForm(){
+  editingId = null;
+  document.getElementById('f-exam').value='';
+  document.getElementById('f-open').value='';
+  document.getElementById('f-close').value='';
+  document.getElementById('f-public').value='tous';
+  document.getElementById('f-visible').checked = true;
+  document.getElementById('addBtn').textContent = 'Ajouter au calendrier';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+}
+
+document.getElementById('cancelEditBtn').addEventListener('click', ()=>{
+  resetForm();
+  document.getElementById('saveNote').textContent = '';
 });
 
 /* ---------- Admin access protected by code (hash only, never the code itself) ---------- */
