@@ -34,8 +34,10 @@ module.exports = async (req, res) => {
     }
 
     const apiUrl = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
+    // Dedicated branch: writes must not trigger a production deploy.
+    const BRANCH = 'data';
 
-    const shaRes = await fetch(apiUrl, {
+    const shaRes = await fetch(apiUrl + '?ref=' + BRANCH, {
       headers: { Authorization: `token ${token}` }
     });
     const shaData = await shaRes.json();
@@ -55,7 +57,8 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         message: 'Mise a jour calendrier TOEIC (admin)',
         content,
-        sha: shaData.sha
+        sha: shaData.sha,
+        branch: BRANCH
       })
     });
     const putData = await putRes.json();
